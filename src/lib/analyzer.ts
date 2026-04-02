@@ -24,10 +24,11 @@ export async function analyzeWithLLM(
     throw new Error("No LLM API key configured (ANTHROPIC_API_KEY or OPENAI_API_KEY)");
   }
 
-  const prompt = `Analysiere die folgenden Website-Inhalte der Firma "${companyName}" (${websiteUrl}) und extrahiere strukturierte Daten.
+  const hasContent = scrapedData.mainPageText.length > 50 || scrapedData.careerPageText;
 
-WEBSITE HAUPTSEITE:
-${scrapedData.mainPageText.slice(0, 8000)}
+  const prompt = `Analysiere die folgenden Daten der Firma "${companyName}" (${websiteUrl}) und extrahiere strukturierte Recruiting-relevante Informationen.
+
+${hasContent ? `WEBSITE HAUPTSEITE:\n${scrapedData.mainPageText.slice(0, 8000)}` : `HINWEIS: Die Website war nicht direkt abrufbar. Bitte schätze auf Basis des Firmennamens "${companyName}" und der Domain ${websiteUrl} was du ableiten kannst.`}
 
 ${scrapedData.careerPageText ? `KARRIERESEITE:\n${scrapedData.careerPageText.slice(0, 8000)}` : "Keine Karriereseite gefunden."}
 
